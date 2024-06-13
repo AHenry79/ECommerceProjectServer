@@ -13,4 +13,11 @@ router.get("/:id", async (req, res, next) => {
     next(err);
   }
 });
+router.post("/", async (req, res, next) => {
+  try {
+    res.send(await addToCartByUserId(req.body));
+  } catch (err) {
+    next(err);
+  }
+});
 module.exports = router;
