@@ -7,7 +7,7 @@ client.connect();
 
 // app.use("/api/users", require("./users"));
 // app.use("/api/products", require("./products"));
-// app.use("/api/favorites", require("./favorites"));
+app.use("/api/cart", require("./api/cart"));
 
 app.listen(8080, () => {
   console.log("App is running at port 8080");

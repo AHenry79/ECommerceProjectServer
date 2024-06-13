@@ -11,11 +11,22 @@ const getAllProducts = async () => {
   return response.rows;
 };
 const getCartItemsByUserId = async (params_id) => {
-  const response = await client.query(`SELECT * FROM cart WHERE user_id=$1`, [
-    params_id,
+  const response = await client.query(
+    `SELECT * FROM cart WHERE customer_id=$1`,
+    [params_id]
+  );
+  const { id, product_id, customer_id } = response.rows[0];
+  const product_response = await client.query(
+    `SELECT* FROM products WHERE id=$1`,
+    [product_id]
+  );
+  const user_response = await client.query(`SELECT * FROM users WHERE id=$1`, [
+    customer_id,
   ]);
   return {
-    cart: response.rows,
+    id,
+    product_id: product_response.rows[0],
+    customer_id: user_response.rows[0],
   };
 };
 const getSingleUserById = async (id) => {
@@ -25,16 +36,16 @@ const getSingleUserById = async (id) => {
   return response.rows[0];
 };
 const addToCartByUserId = async (body) => {
-  await client.query(`INSERT INTO cart(product_id, user_id) VALUES($1, $2)`, [
-    body.product_id,
-    body.user_id,
-  ]);
+  await client.query(
+    `INSERT INTO cart(product_id, customer_id) VALUES($1, $2)`,
+    [body.product_id, body.user_id]
+  );
   return {
     product_id: body.product_id,
     user_id: body.user_id,
   };
 };
-const deleteCartItemByUserId = async (id) => {
+const deleteCartItemById = async (id) => {
   await client.query(`DELETE FROM cart WHERE id = $1`, [Number(id)]);
   return {
     id: id,
@@ -46,6 +57,6 @@ module.exports = {
   getSingleUserById,
   getCartItemsByUserId,
   addToCartByUserId,
-  deleteCartItemByUserId,
+  deleteCartItemById,
   client,
 };
