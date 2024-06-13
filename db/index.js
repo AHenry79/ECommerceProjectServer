@@ -1,6 +1,6 @@
 const pg = require("pg");
 
-const client = new pg.Client("postgres://localhost/ecommerce");
+const client = new pg.Client("postgres://localhost/grocery_store");
 
 const getAllUsers = async () => {
   const response = await client.query(`SELECT * FROM users ORDER BY id ASC`);
