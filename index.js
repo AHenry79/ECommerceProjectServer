@@ -5,7 +5,7 @@ const { client } = require("./db/index");
 app.use(express.json());
 client.connect();
 
-// app.use("/api/users", require("./users"));
+app.use("/api/users", require("./users"));
 // app.use("/api/products", require("./products"));
 app.use("/api/", require("./api/cart.js"));
 
