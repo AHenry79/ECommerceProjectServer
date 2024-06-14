@@ -10,6 +10,7 @@ async function dropTables() {
         DROP TABLE IF EXISTS orders;
         DROP TABLE IF EXISTS products;
         DROP TABLE IF EXISTS users;
+        DROP TABLE IF EXISTS orders;
       `);
 
     console.log("Finished dropping tables!");
@@ -79,7 +80,7 @@ async function createInitialUsers() {
         INSERT INTO "users" ("id", "username", "password", "email", "phone_number", "created_at", "updated_at") VALUES
         (5, 'sam23', 'pass123', 'sam233@gmail.com', '718-928-2383', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
         (6, 'peter2434', 'pass333', 'pete5@gmail.com', '888-923-3283', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
-        (7, 'matt343', 'mattp09@gmail.com', 'mparker56@gmail.com', '029-238-2382', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04');
+        (7, 'matt343', 'pass444', 'mparker56@gmail.com', '029-238-2382', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04');
         `);
     console.log("Finished creating users!");
   } catch (error) {
