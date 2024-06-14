@@ -7,6 +7,7 @@ async function dropTables() {
     // have to make sure to drop in correct order
     await client.query(`
         DROP TABLE IF EXISTS cart;
+        DROP TABLE IF EXISTS orders;
         DROP TABLE IF EXISTS products;
         DROP TABLE IF EXISTS users;
         DROP TABLE IF EXISTS orders;
@@ -27,7 +28,7 @@ async function createTables() {
         CREATE TABLE "products" (
         "id" SERIAL NOT NULL,
         "price" numeric NOT NULL,
-        "desciption" text NOT NULL,
+        "description" text NOT NULL,
         "name" text NOT NULL,
         "categories" text NOT NULL,
         "image_url" varchar NOT NULL,
@@ -40,7 +41,7 @@ async function createTables() {
         "username" text NOT NULL,
         "password" text NOT NULL,
         "email" text NOT NULL,
-        "phoneNumber" text NOT NULL,
+        "phone_number" text NOT NULL,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now(),
         PRIMARY KEY ("id")
@@ -76,7 +77,7 @@ async function createInitialUsers() {
     await client.query(`
         CREATE UNIQUE INDEX users_username_idx ON users USING btree (username);
 
-        INSERT INTO "users" ("id", "username", "password", "email", "phoneNumber", "created_at", "updated_at") VALUES
+        INSERT INTO "users" ("id", "username", "password", "email", "phone_number", "created_at", "updated_at") VALUES
         (5, 'sam23', 'pass123', 'sam233@gmail.com', '718-928-2383', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
         (6, 'peter2434', 'pass333', 'pete5@gmail.com', '888-923-3283', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
         (7, 'matt343', 'pass444', 'mparker56@gmail.com', '029-238-2382', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04');
@@ -91,7 +92,7 @@ async function createInitialProducts() {
   await client.query(`
            CREATE UNIQUE INDEX product_pkey ON products USING btree (id);
 
-            INSERT INTO "products" ("id", "price", "desciption", "name", "categories", "image_url", "availability") VALUES
+            INSERT INTO "products" ("id", "price", "description", "name", "categories", "image_url", "availability") VALUES
             (4, 5.99, 'fruit', 'blueberries', 'produce', 'https://i5.walmartimages.com/asr/206db476-ca7d-4919-a4a5-c25dd2ae5feb_1.f7927999cdacc320a6c5a83462cadbd5.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF', 't'),
             (14, 1.99, 'fruit', 'bannas', 'produce', 'https://www.walmart.com/ip/Marketside-Fresh-Organic-Bananas-Bunch/51259338?athbdg=L1200', 't'),
             (16, 5.44, 'fruit', 'peaches', 'produce', 'https://www.walmart.com/ip/Fresh-Organic-Peaches-2-lb-Bag/157005099', 't'),
