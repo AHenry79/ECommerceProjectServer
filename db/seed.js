@@ -130,7 +130,7 @@ async function createInitialOrderedItems() {
     console.log("Starting to create ordered items...");
     await client.query(`
         INSERT INTO "orders" ("product_id", "customer_id") VALUES
-        (14, 7)
+        (14, 3)
         `);
     console.log("Finished creating ordered items!");
   } catch (error) {
