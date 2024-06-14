@@ -1,6 +1,9 @@
 const pg = require("pg");
-
 const client = new pg.Client("postgres://localhost/grocery_store");
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const JWT = "shhhhhhhh";
 
 const getAllUsers = async () => {
   const response = await client.query(`SELECT * FROM users ORDER BY id ASC`);
@@ -58,14 +61,86 @@ const deleteCartItemById = async (id) => {
     id: id,
   };
 };
+const createUser = async ({ username, password, email, phoneNumber }) => {
+  const response = await client.query(
+    `INSERT INTO users(username, password, email, phoneNumber) 
+        VALUES($1, $2, $3, $4) RETURNING *`,
+    [username, await bcrypt.hash(password, 5), email, phoneNumber]
+  );
+  return response.rows[0];
+};
+
+const createUserAndGenerateToken = async ({
+  username,
+  password,
+  email,
+  phoneNumber,
+}) => {
+  const user = await createUser({ username, password, email, phoneNumber });
+  const token = await jwt.sign({ id: user.id }, JWT);
+  return {
+    token,
+  };
+};
+
+const authenticate = async ({ username, password }) => {
+  const response = await client.query(
+    `SELECT id, username, 
+            password FROM users WHERE username=$1`,
+    [username]
+  );
+  if (
+    !response.rows.length ||
+    (await bcrypt.compare(password, response.rows[0].password)) === false
+  ) {
+    const error = Error("not authorized");
+    error.status = 401;
+    throw error;
+  }
+
+  const token = await jwt.sign({ id: response.rows[0].id }, JWT);
+  return {
+    token,
+  };
+};
+
+// middlewarefunction
+const findUserWithToken = async (token) => {
+  let id;
+  try {
+    const payload = await jwt.verify(token, JWT);
+    id = payload.id;
+  } catch (ex) {
+    const error = Error("not authorized");
+    error.status = 401;
+    throw error;
+  }
+
+  const response = await client.query(
+    `SELECT id, username 
+            FROM users WHERE id=$1`,
+    [id]
+  );
+
+  if (!response.rows.length) {
+    const error = Error("not authorized");
+    error.status = 401;
+    throw error;
+  }
+
+  return response.rows[0];
+};
 module.exports = {
   getAllUsers,
   getAllProducts,
   getSingleProduct,
-  getProductsByCartId,
   getSingleUserById,
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
+  createUser,
+  createUserAndGenerateToken,
+  authenticate,
+  findUserWithToken,
   client,
 };
