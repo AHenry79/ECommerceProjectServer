@@ -8,6 +8,7 @@ client.connect();
 app.use("/api/users", require("./api/users"));
 app.use("/api/products", require("./api/products"));
 app.use("/api/", require("./api/cart.js"));
+app.use("/auth", require("./api/auth"));
 
 app.listen(6800, () => {
   console.log("App is running at port 6800");

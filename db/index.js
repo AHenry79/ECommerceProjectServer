@@ -61,11 +61,11 @@ const deleteCartItemById = async (id) => {
     id: id,
   };
 };
-const createUser = async ({ username, password, email, phoneNumber }) => {
+const createUser = async ({ username, password, email, phone_number }) => {
   const response = await client.query(
-    `INSERT INTO users(username, password, email, phoneNumber) 
+    `INSERT INTO users(username, password, email, phone_number) 
         VALUES($1, $2, $3, $4) RETURNING *`,
-    [username, await bcrypt.hash(password, 5), email, phoneNumber]
+    [username, await bcrypt.hash(password, 5), email, phone_number]
   );
   return response.rows[0];
 };
@@ -74,9 +74,9 @@ const createUserAndGenerateToken = async ({
   username,
   password,
   email,
-  phoneNumber,
+  phone_number,
 }) => {
-  const user = await createUser({ username, password, email, phoneNumber });
+  const user = await createUser({ username, password, email, phone_number });
   const token = await jwt.sign({ id: user.id }, JWT);
   return {
     token,
