@@ -9,6 +9,7 @@ async function dropTables() {
         DROP TABLE IF EXISTS cart;
         DROP TABLE IF EXISTS products;
         DROP TABLE IF EXISTS users;
+        DROP TABLE IF EXISTS orders;
       `);
 
     console.log("Finished dropping tables!");
@@ -49,6 +50,14 @@ async function createTables() {
         "id" SERIAL NOT NULL,
         "product_id" int4 NOT NULL,
         "customer_id" int4 NOT NULL,
+        PRIMARY KEY ("id")
+        );
+
+        CREATE TABLE "orders" (
+        "id" SERIAL NOT NULL,
+        "product_id" int4 NOT NULL,
+        "customer_id" int4 NOT NULL,
+        "ordered_at" timestamptz NOT NULL DEFAULT now(), 
         PRIMARY KEY ("id")
         );
       `);
@@ -104,7 +113,7 @@ async function createInitialProducts() {
 }
 async function createInitialCartItems() {
   try {
-    console.log("Starting to create posts...");
+    console.log("Starting to create cart items...");
     await client.query(`
         INSERT INTO "cart" ("id", "product_id", "customer_id") VALUES
         (2, 27, 7),
@@ -117,7 +126,19 @@ async function createInitialCartItems() {
     throw error;
   }
 }
-
+async function createInitialOrderedItems() {
+  try {
+    console.log("Starting to create ordered items...");
+    await client.query(`
+        INSERT INTO "orders" ("product_id", "customer_id") VALUES
+        (14, 7)
+        `);
+    console.log("Finished creating ordered items!");
+  } catch (error) {
+    console.log("Error creating order items!");
+    throw error;
+  }
+}
 async function rebuildDB() {
   try {
     client.connect();
@@ -127,6 +148,7 @@ async function rebuildDB() {
     await createInitialUsers();
     await createInitialCartItems();
     await createInitialProducts();
+    await createInitialOrderedItems();
   } catch (error) {
     console.log("Error during rebuildDB");
     throw error;
