@@ -55,6 +55,23 @@ const getSingleUserById = async (id) => {
   ]);
   return response.rows[0];
 };
+const getAllOrders = async () => {
+  const response = await client.query(`SELECT * FROM orders ORDER BY id ASC`);
+  return response.rows;
+};
+const getSingleOrder = async (id) => {
+  const response = await client.query(`SELECT * FROM orders WHERE id = $1`, [
+    id,
+  ]);
+  return response.rows[0];
+};
+const getProductsByOrderId = async (id) => {
+  const response = await client.query(
+    `SELECT * FROM orders WHERE customer_id = $1`,
+    [id]
+  );
+  return response.rows;
+};
 const addToCartByUserId = async (body) => {
   await client.query(
     `INSERT INTO cart(product_id, customer_id) VALUES($1, $2)`,
@@ -80,5 +97,8 @@ module.exports = {
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
+  getAllOrders,
+  getSingleOrder,
+  getProductsByOrderId,
   client,
 };
