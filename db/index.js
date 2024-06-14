@@ -7,9 +7,29 @@ const getAllUsers = async () => {
   return response.rows;
 };
 const getAllProducts = async () => {
-  const response = await client.query(`SELECT * FROM product ORDER BY id ASC`);
+  const response = await client.query(`SELECT * FROM products ORDER BY id ASC`);
   return response.rows;
 };
+const getSingleProduct = async (id) => {
+  const response = await client.query(`SELECT * FROM products WHERE id = $1`, [
+    id,
+  ]);
+  return response.rows[0];
+};
+const getProductsByCartId = async (params_id) => {
+  const response = await client.query(
+    `SELECT * FROM cart WHERE customer_id= $1`,
+    [params_id]
+  );
+  const { id, customer_id, product_id } = response.rows[0];
+  return {
+    id,
+    customer_id,
+    product_id: response.rows,
+    // product: products_response.rows,
+  };
+};
+
 const getCartItemsByUserId = async (params_id) => {
   const response = await client.query(
     `SELECT * FROM cart WHERE customer_id=$1`,
@@ -54,6 +74,8 @@ const deleteCartItemById = async (id) => {
 module.exports = {
   getAllUsers,
   getAllProducts,
+  getSingleProduct,
+  getProductsByCartId,
   getSingleUserById,
   getCartItemsByUserId,
   addToCartByUserId,
