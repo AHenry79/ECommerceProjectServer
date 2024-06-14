@@ -4,6 +4,7 @@ const {
   getAllOrders,
   getSingleOrder,
   getProductsByOrderId,
+  checkOut,
 } = require("../db/index");
 
 ordersRouter.get("/", async (req, res, next) => {
@@ -23,6 +24,13 @@ ordersRouter.get("/:id", async (req, res, next) => {
 ordersRouter.get("/users/:id", async (req, res, next) => {
   try {
     res.send(await getProductsByOrderId(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+ordersRouter.post("/", async (req, res, next) => {
+  try {
+    res.send(await checkOut(req.body));
   } catch (err) {
     next(err);
   }
