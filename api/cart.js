@@ -6,7 +6,7 @@ const {
   deleteCartItemById,
 } = require("../db/index");
 
-router.get("/:id", async (req, res, next) => {
+router.get("/users/:id", async (req, res, next) => {
   try {
     res.send(await getCartItemsByUserId(req.params.id));
   } catch (err) {
@@ -20,7 +20,7 @@ router.post("/", async (req, res, next) => {
     next(err);
   }
 });
-router.delete("/users/:id", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     res.send(await deleteCartItemById(req.params.id));
   } catch (err) {
