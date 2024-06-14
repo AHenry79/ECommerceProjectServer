@@ -16,19 +16,6 @@ const getSingleProduct = async (id) => {
   ]);
   return response.rows[0];
 };
-const getProductsByCartId = async (params_id) => {
-  const response = await client.query(
-    `SELECT * FROM cart WHERE customer_id= $1`,
-    [params_id]
-  );
-  const { id, customer_id, product_id } = response.rows[0];
-  return {
-    id,
-    customer_id,
-    product_id: response.rows,
-    // product: products_response.rows,
-  };
-};
 
 const getCartItemsByUserId = async (params_id) => {
   const response = await client.query(

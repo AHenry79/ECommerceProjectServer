@@ -20,12 +20,5 @@ productsRouter.get("/:id", async (req, res, next) => {
     next(err);
   }
 });
-productsRouter.get("/cart/:id", async (req, res, next) => {
-  try {
-    res.send(await getProductsByCartId(req.params.id));
-  } catch (err) {
-    next(err);
-  }
-});
-// changes
+
 module.exports = productsRouter;
