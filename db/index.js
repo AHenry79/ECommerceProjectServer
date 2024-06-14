@@ -19,21 +19,32 @@ const getSingleProduct = async (id) => {
 
 const getCartItemsByUserId = async (params_id) => {
   const response = await client.query(
-    `SELECT * FROM cart WHERE customer_id=$1`,
+    `SELECT * FROM cart WHERE customer_id = $1`,
     [params_id]
   );
-  const { id, product_id, customer_id } = response.rows[0];
-  const product_response = await client.query(
-    `SELECT* FROM products WHERE id=$1`,
-    [product_id]
-  );
-  const user_response = await client.query(`SELECT * FROM users WHERE id=$1`, [
-    customer_id,
-  ]);
+  const { id, customer_id } = response.rows[0];
+  const cartItems = [];
+  for (let i of response.rows) {
+    const product_response = await client.query(
+      `SELECT * FROM products WHERE id = $1`,
+      [i.product_id]
+    );
+    const product = product_response.rows[0];
+    cartItems.push({
+      product_id: product.id,
+      product_name: product.name,
+      price: product.price,
+      description: product.description,
+      categories: product.categories,
+      image_url: product.image_url,
+      availability: product.availability,
+    });
+  }
+
   return {
-    id,
-    product_id: product_response.rows[0],
-    customer_id: user_response.rows[0],
+    id: id,
+    customer_id: customer_id,
+    cart: cartItems,
   };
 };
 const getSingleUserById = async (id) => {
@@ -41,6 +52,23 @@ const getSingleUserById = async (id) => {
     id,
   ]);
   return response.rows[0];
+};
+const getAllOrders = async () => {
+  const response = await client.query(`SELECT * FROM orders ORDER BY id ASC`);
+  return response.rows;
+};
+const getSingleOrder = async (id) => {
+  const response = await client.query(`SELECT * FROM orders WHERE id = $1`, [
+    id,
+  ]);
+  return response.rows[0];
+};
+const getProductsByOrderId = async (id) => {
+  const response = await client.query(
+    `SELECT * FROM orders WHERE customer_id = $1`,
+    [id]
+  );
+  return response.rows;
 };
 const addToCartByUserId = async (body) => {
   await client.query(
@@ -67,5 +95,8 @@ module.exports = {
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
+  getAllOrders,
+  getSingleOrder,
+  getProductsByOrderId,
   client,
 };
