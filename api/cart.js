@@ -6,9 +6,23 @@ const {
   deleteCartItemById,
 } = require("../db/index");
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id/cart", async (req, res, next) => {
   try {
     res.send(await getCartItemsByUserId(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
+router.post("/cart", async (req, res, next) => {
+  try {
+    res.send(await addToCartByUserId(req.body));
+  } catch (err) {
+    next(err);
+  }
+});
+router.delete("/cart/:id", async (req, res, next) => {
+  try {
+    res.send(await deleteCartItemById(req.params.id));
   } catch (err) {
     next(err);
   }

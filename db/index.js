@@ -39,11 +39,11 @@ const getSingleUserById = async (id) => {
 const addToCartByUserId = async (body) => {
   await client.query(
     `INSERT INTO cart(product_id, customer_id) VALUES($1, $2)`,
-    [body.product_id, body.user_id]
+    [body.product_id, body.customer_id]
   );
   return {
     product_id: body.product_id,
-    user_id: body.user_id,
+    customer_id: body.customer_id,
   };
 };
 
