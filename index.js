@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
 const { client } = require("./db/index");
+const cors = require("cors");
 
 app.use(express.json());
+app.use(cors());
 client.connect();
 
 app.use("/api/users", require("./api/users"));
