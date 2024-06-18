@@ -44,6 +44,7 @@ async function createTables() {
         "phone_number" text NOT NULL,
         "created_at" timestamptz NOT NULL DEFAULT now(),
         "updated_at" timestamptz NOT NULL DEFAULT now(),
+        "is_admin" bool NOT NULL DEFAULT false,
         PRIMARY KEY ("id")
         );
 
@@ -77,10 +78,11 @@ async function createInitialUsers() {
     await client.query(`
         CREATE UNIQUE INDEX users_username_idx ON users USING btree (username);
 
-        INSERT INTO "users" ("username", "password", "email", "phone_number", "created_at", "updated_at") VALUES
-        ('sam23', 'pass123', 'sam233@gmail.com', '718-928-2383', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
-        ('peter2434', 'pass333', 'pete5@gmail.com', '888-923-3283', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04'),
-        ('matt343', 'pass444', 'mparker56@gmail.com', '029-238-2382', '2024-06-13 14:28:44.156062-04', '2024-06-13 14:28:44.156062-04');
+        INSERT INTO "users" ("username", "password", "email", "phone_number", "is_admin") VALUES
+        ('sam23', '$2a$12$FDlGHy/b5B9FR4E77QKl8.dJVBBWr8dbjlvtoY/2wfpG9Av.aYjtu', 'sam233@gmail.com', '718-928-2383', 'f'),
+        ('peter2434', '$2a$12$Xmf2olmUzUAFIydADFzK6emXE9fdhxpN4K3IC9EDQUtJpEMPVWtUW', 'pete5@gmail.com', '888-923-3283', 'f'),
+        ('matt343', '$2a$12$y2na6B3jaW9p1TeZ9M2O7eY3eBLQcWrt7ABWMx334enQdqKA12eNe', 'mparker56@gmail.com', '029-238-2382', 'f'),
+        ('admin', '$2a$12$DDAlVqFpMuuqN9xOPGUgG.bAfA6.uzb2ekx9IqiMmp/6EjC.1R7eW', 'admin@gmail.com', '555-555-5555', 't');
         `);
     console.log("Finished creating users!");
   } catch (error) {
@@ -115,8 +117,8 @@ async function createInitialCartItems() {
     console.log("Starting to create cart items...");
     await client.query(`
         INSERT INTO "cart" ("product_id", "customer_id") VALUES
-        (27, 3),
-        (28, 1),
+        (3, 3),
+        (10, 1),
         (14, 3)
         `);
     console.log("Finished creating cart items!");
@@ -130,7 +132,9 @@ async function createInitialOrderedItems() {
     console.log("Starting to create ordered items...");
     await client.query(`
         INSERT INTO "orders" ("product_id", "customer_id") VALUES
-        (14, 3)
+        (14, 3),
+        (5, 2),
+        (1, 3)
         `);
     console.log("Finished creating ordered items!");
   } catch (error) {

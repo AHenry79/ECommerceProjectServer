@@ -35,6 +35,7 @@ const getCartItemsByUserId = async (params_id) => {
     );
     const product = product_response.rows[0];
     cartItems.push({
+      cart_id: i.id,
       product_id: product.id,
       product_name: product.name,
       price: product.price,
@@ -46,6 +47,7 @@ const getCartItemsByUserId = async (params_id) => {
   }
 
   const cart = cartItems.map((item) => ({
+    cart_id: item.cart_id,
     product_id: item.product_id,
     product_name: item.product_name,
     price: item.price,
@@ -71,18 +73,44 @@ const getAllOrders = async () => {
   const response = await client.query(`SELECT * FROM orders ORDER BY id ASC`);
   return response.rows;
 };
-const getSingleOrder = async (id) => {
-  const response = await client.query(`SELECT * FROM orders WHERE id = $1`, [
-    id,
-  ]);
-  return response.rows[0];
-};
-const getProductsByOrderId = async (id) => {
-  const response = await client.query(
-    `SELECT * FROM orders WHERE customer_id = $1`,
-    [id]
+const getSingleOrder = async (id, customer_id) => {
+  const cart = await client.query(
+    `SELECT customer_id FROM orders WHERE id = $1`,
+    [Number(id)]
   );
-  return response.rows;
+  if (
+    cart &&
+    cart.rows &&
+    cart.rows.length > 0 &&
+    cart.rows[0].customer_id === customer_id
+  ) {
+    const response = await client.query(`SELECT * FROM orders WHERE id = $1`, [
+      Number(id),
+    ]);
+    return response.rows[0];
+  } else {
+    throw new Error("User is not authorized to access these orders");
+  }
+};
+const getProductsByOrderId = async (id, customer_id) => {
+  const cart = await client.query(
+    `SELECT customer_id FROM cart WHERE customer_id = $1`,
+    [Number(id)]
+  );
+  if (
+    cart &&
+    cart.rows &&
+    cart.rows.length > 0 &&
+    cart.rows[0].customer_id === customer_id
+  ) {
+    const response = await client.query(
+      `SELECT * FROM orders WHERE customer_id = $1`,
+      [id]
+    );
+    return response.rows;
+  } else {
+    throw new Error("User is not authorized to access these orders");
+  }
 };
 const addToCartByUserId = async (body) => {
   await client.query(
@@ -94,11 +122,24 @@ const addToCartByUserId = async (body) => {
     customer_id: body.customer_id,
   };
 };
-const deleteCartItemById = async (id) => {
-  await client.query(`DELETE FROM cart WHERE id = $1`, [Number(id)]);
-  return {
-    id: id,
-  };
+const deleteCartItemById = async (id, customer_id) => {
+  const cart = await client.query(
+    `SELECT customer_id FROM cart WHERE id = $1`,
+    [Number(id)]
+  );
+  if (
+    cart &&
+    cart.rows &&
+    cart.rows.length > 0 &&
+    cart.rows[0].customer_id === customer_id
+  ) {
+    await client.query(`DELETE FROM cart WHERE id=$1`, [Number(id)]);
+    return {
+      id: id,
+    };
+  } else {
+    throw new Error("User is not authorized to delete this cart item");
+  }
 };
 const checkOut = async (body) => {
   await client.query(
@@ -166,8 +207,7 @@ const findUserWithToken = async (token) => {
   }
 
   const response = await client.query(
-    `SELECT id, username 
-            FROM users WHERE id=$1`,
+    `SELECT id, username, email, phone_number, created_at, updated_at, is_admin FROM users WHERE id=$1`,
     [id]
   );
 

@@ -4,25 +4,37 @@ const {
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
+  findUserWithToken,
 } = require("../db/index");
 
-router.get("/users/:id", async (req, res, next) => {
+const isLoggedIn = async (req, res, next) => {
+  try {
+    req.user = await findUserWithToken(req.headers.authorization);
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+router.get("/users/:id", isLoggedIn, async (req, res, next) => {
   try {
     res.send(await getCartItemsByUserId(req.params.id));
   } catch (err) {
     next(err);
   }
 });
-router.post("/", async (req, res, next) => {
+router.post("/", isLoggedIn, async (req, res, next) => {
   try {
+    req.body.customer_id = req.user.id;
     res.send(await addToCartByUserId(req.body));
   } catch (err) {
     next(err);
   }
 });
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", isLoggedIn, async (req, res, next) => {
   try {
-    res.send(await deleteCartItemById(req.params.id));
+    const customer_id = req.user.id;
+    res.send(await deleteCartItemById(req.params.id, customer_id));
   } catch (err) {
     next(err);
   }
