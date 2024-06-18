@@ -3,8 +3,24 @@ const productsRouter = express.Router();
 const {
   getAllProducts,
   getSingleProduct,
-  getProductsByCartId,
+  findUserWithToken,
+  addProduct,
+  editProduct,
+  deleteProduct,
 } = require("../db/index");
+
+const isAdmin = async (req, res, next) => {
+  try {
+    req.user = await findUserWithToken(req.headers.authorization);
+    if (req.user.is_admin === true) {
+      next();
+    } else {
+      throw Error("Not authorized");
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 
 productsRouter.get("/", async (req, res, next) => {
   try {
@@ -21,4 +37,27 @@ productsRouter.get("/:id", async (req, res, next) => {
   }
 });
 
+productsRouter.post("/", isAdmin, async (req, res, next) => {
+  try {
+    res.send(await addProduct(req.body));
+  } catch (err) {
+    next(err);
+  }
+});
+
+productsRouter.put("/:id", isAdmin, async (req, res, next) => {
+  try {
+    res.send(await editProduct(req.params.id, req.body));
+  } catch (err) {
+    next(err);
+  }
+});
+
+productsRouter.delete("/:id", isAdmin, async (req, res, next) => {
+  try {
+    res.send(await deleteProduct(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+});
 module.exports = productsRouter;

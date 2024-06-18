@@ -19,7 +19,55 @@ const getSingleProduct = async (id) => {
   ]);
   return response.rows[0];
 };
-
+const addProduct = async (body) => {
+  await client.query(
+    `INSERT INTO products(price, description, name, categories, image_url, availability) VALUES($1, $2, $3, $4, $5, $6)`,
+    [
+      body.price,
+      body.description,
+      body.name,
+      body.categories,
+      body.image_url,
+      body.availability,
+    ]
+  );
+  return {
+    price: body.price,
+    description: body.description,
+    name: body.name,
+    categories: body.categories,
+    image_url: body.image_url,
+    availability: body.availability,
+  };
+};
+const editProduct = async (id, body) => {
+  await client.query(
+    `UPDATE products SET price = $1, description = $2, name = $3, categories = $4, image_url = $5, availability = $6 WHERE id = $7`,
+    [
+      body.price,
+      body.description,
+      body.name,
+      body.categories,
+      body.image_url,
+      body.availability,
+      id,
+    ]
+  );
+  return {
+    price: body.price,
+    description: body.description,
+    name: body.name,
+    categories: body.categories,
+    image_url: body.image_url,
+    availability: body.availability,
+  };
+};
+const deleteProduct = async (id) => {
+  await client.query(`DELETE FROM products WHERE id=$1`, [Number(id)]);
+  return {
+    id: id,
+  };
+};
 const getCartItemsByUserId = async (params_id) => {
   const response = await client.query(
     `SELECT * FROM cart WHERE customer_id = $1`,
@@ -235,5 +283,8 @@ module.exports = {
   getSingleOrder,
   getProductsByOrderId,
   checkOut,
+  addProduct,
+  editProduct,
+  deleteProduct,
   client,
 };

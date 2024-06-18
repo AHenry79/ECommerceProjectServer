@@ -77,6 +77,7 @@ async function createInitialUsers() {
 
     await client.query(`
         CREATE UNIQUE INDEX users_username_idx ON users USING btree (username);
+        CREATE UNIQUE INDEX users_email_idx ON users USING btree (email);
 
         INSERT INTO "users" ("username", "password", "email", "phone_number", "is_admin") VALUES
         ('sam23', '$2a$12$FDlGHy/b5B9FR4E77QKl8.dJVBBWr8dbjlvtoY/2wfpG9Av.aYjtu', 'sam233@gmail.com', '718-928-2383', 'f'),
@@ -93,21 +94,20 @@ async function createInitialUsers() {
 async function createInitialProducts() {
   await client.query(`
             INSERT INTO "products" ("price", "description", "name", "categories", "image_url", "availability") VALUES
-            (5.99, 'fruit', 'blueberries', 'produce', 'https://i5.walmartimages.com/asr/206db476-ca7d-4919-a4a5-c25dd2ae5feb_1.f7927999cdacc320a6c5a83462cadbd5.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF', 't'),
-            (1.99, 'fruit', 'bannas', 'produce', 'https://www.walmart.com/ip/Marketside-Fresh-Organic-Bananas-Bunch/51259338?athbdg=L1200', 't'),
-            (5.44, 'fruit', 'peaches', 'produce', 'https://www.walmart.com/ip/Fresh-Organic-Peaches-2-lb-Bag/157005099', 't'),
-            (4.92, 'fruit', 'lemon', 'produce', 'https://www.walmart.com/ip/Fresh-Organic-Lemons-2-lb-Bag/51259193', 't'),
-            (3.47, 'fruit', 'strawberries', 'produce', 'https://www.walmart.com/ip/Fresh-USDA-Organic-Strawberries-1-lb-Container/45618183', 't'),
-            (3.66, 'fruit', 'Pink Lady Apples', 'produce', 'https://www.walmart.com/ip/Fresh-Organic-Pink-Lady-Apples-2-lb-Pouch/51259207', 't'),
-            (8.12, 'fruit', 'fuji apples', 'produce', 'https://www.walmart.com/ip/Fresh-Organic-Fuji-Apples-3-lb-Bag/165846014', 't'),
-            (1.66, 'vegetable', 'Baby Carrots', 'produce', 'https://www.walmart.com/ip/Organic-Marketside-Fresh-Baby-Peeled-Carrots-1-lb-Bag/51259199', 't'),
-            (1.99, 'vegetable', 'Onions', 'produce', 'https://www.walmart.com/ip/Fresh-Yellow-Onions-3-lb-Bag/10447842', 't'),
-            (0.88, 'vegetable', 'cilantro', 'produce', 'https://www.walmart.com/ip/Fresh-Cilantro-Bunch/160597260', 't'),
-            (2.99, 'vegetable', 'broccoli', 'produce', ' https://www.walmart.com/ip/Savor-Brands-Grade-A-Broccoli-Cuts-20-Pound-1-each/374312923?from=/search', 't'),
-            (3.99, 'vegetable', 'green beans', 'produce', ' https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.eatingwell.com%2Fthmb%2FzOSGCalh6otXC12446RNP8_TeBM%3D%2F1500x0%2Ffilters%3Ano_upscale()%3Amax_bytes(150000)%3Astrip_icc()%2Fquick-easy-green-beans-step-2-9d1ca0c6d9f94332be6f371e257106da.jpg&tbnid=fjLw8FBJfjShvM&vet=12ahUKEwilg82RjtmGAxVQD2IAHYM4CwkQMygBegUIARCyAQ..i&imgrefurl=https%3A%2F%2Fwww.eatingwell.com%2Frecipe%2F362784%2Fquick-easy-green-beans%2F&docid=XQby3dbpEQBpMM&w=1500&h=1500&q=green%20beans&ved=2ahUKEwilg82RjtmGAxVQD2IAHYM4CwkQMygBegUIARCyAQ', 't'),
-            (2.99, 'vegetable', 'cauliflower', 'produce', 'https://www.google.com/imgres?imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F2%2F2f%2FChou-fleur_02.jpg&tbnid=jTLnX-4gjJsJ1M&vet=12ahUKEwi0xuqkjtmGAxVFOlkFHUHDBBAQMygDegQIARBt..i&imgrefurl=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FCauliflower&docid=it6iEba4DxmQbM&w=4320&h=3456&q=cauliflower&ved=2ahUKEwi0xuqkjtmGAxVFOlkFHUHDBBAQMygDegQIARBt', 't'),
+            (1.99, 'fruit', 'bannas', 'produce', 'https://media.npr.org/assets/img/2011/08/19/istock_000017061174small_wide-a68a0b8f0b250cba6f5964ce5807de10d93dd4b9.jpg?s=1400&c=100&f=jpeg', 't'),
+            (5.44, 'fruit', 'peaches', 'produce', 'https://media.istockphoto.com/id/1137630158/photo/single-peach-fruit-with-leaf-isolated-on-white.jpg?s=612x612&w=0&k=20&c=V8OmiANLcA-hGHcyK6QkXRhXvpnUiAcXo6uKnbwTtQ8=', 't'),
+            (4.92, 'fruit', 'lemon', 'produce', 'https://media.istockphoto.com/id/1389128157/photo/lemon-fruit-with-leaf-isolated-whole-lemon-and-a-half-with-leaves-on-white-background-lemons.jpg?s=612x612&w=0&k=20&c=Gjyv0Yd0gMG4JZ5iE9e864ilZrurflx1gU6cKHn4E2s=', 't'),
+            (3.47, 'fruit', 'strawberries', 'produce', 'https://i5.walmartimages.com/asr/373f0c0a-d976-4518-967c-9e8c626d1a10.fd992b4534c99ffa7bba91525be393cb.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF', 't'),
+            (3.66, 'fruit', 'Pink Lady Apples', 'produce', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIkKX2p0tqYO1BTqttWvcvugD5yNcPnG6fnQ&usqp=CAU', 't'),
+            (8.12, 'fruit', 'fuji apples', 'produce', 'https://doorstepproduce.com/cdn/shop/products/6000200094512.jpg?v=1601387354', 't'),
+            (1.66, 'vegetable', 'Baby Carrots', 'produce', 'https://static.vecteezy.com/system/resources/previews/003/040/897/large_2x/baby-carrots-on-white-background-free-photo.jpg', 't'),
+            (1.99, 'vegetable', 'Onions', 'produce', 'https://toriavey.com/images/2013/05/All-About-Onions-on-TheShiksa.com-history-cooking-tutorial.jpg', 't'),
+            (0.88, 'vegetable', 'cilantro', 'produce', 'https://t3.ftcdn.net/jpg/01/01/26/10/360_F_101261047_sU0WdKqW7ugC92ou2M2ZWcJTTpwLJJe2.jpg', 't'),
+            (2.99, 'vegetable', 'broccoli', 'produce', 'https://cdn.britannica.com/25/78225-050-1781F6B7/broccoli-florets.jpg', 't'),
+            (3.99, 'vegetable', 'green beans', 'produce', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6spTGXw-IwqJvJ33mo4c4eO3W41HbSKkPzk-R9wPjimCCEY_BnRyWbZViLUO26NbiqkQ&usqp=CAU', 't'),
+            (2.99, 'vegetable', 'cauliflower', 'produce', 'https://img.freepik.com/premium-photo/white-cauliflower-white-isolated-background_565470-663.jpg', 't'),
             (5.99, 'fruit', 'kiwi', 'produce', 'https://images.immediate.co.uk/production/volatile/sites/30/2020/02/Kiwi-fruits-582a07b.jpg?quality=90&resize=556,505', 't'),
-            (7.99, 'fruit', 'cherries', 'produce', 'https://www.google.com/imgres?imgurl=https%3A%2F%2Fblog.lexmed.com%2Fimages%2Flibrariesprovider80%2Fblog-post-featured-images%2Fshutterstock_1933299218.jpg%3Fsfvrsn%3D4a8d900b_0&tbnid=XRwrOMUTKqeYkM&vet=12ahUKEwi3xrD8jtmGAxXiBmIAHYfaCCUQMygEegUIARCyAQ..i&imgrefurl=https%3A%2F%2Fblog.lexmed.com%2Fhome%2Fblog%2F2022%2F11%2F01%2Fsuperfood-of-the-month-cherries&docid=KZWe2fE4iYnO_M&w=1900&h=1267&q=cherries&ved=2ahUKEwi3xrD8jtmGAxXiBmIAHYfaCCUQMygEegUIARCyAQ', 't'),
+            (7.99, 'fruit', 'cherries', 'produce', 'https://t4.ftcdn.net/jpg/08/00/85/75/360_F_800857572_Getr5G7eSd41d1tpzawixAs43sSnevSH.jpg', 't'),
             (10.99, 'fruit', 'watermelon', 'produce', 'https://cdn.britannica.com/99/143599-050-C3289491/Watermelon.jpg', 't'),
             (5.99, 'fruit', 'grape', 'produce', 'https://www.fourwindsgrowers.com/cdn/shop/products/blackmonukka_1024x1024.jpg?v=1538780984', 't')
 `);
