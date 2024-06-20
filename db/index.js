@@ -222,11 +222,9 @@ const createUserAndGenerateToken = async ({
 };
 
 const authenticate = async ({ username, password }) => {
-  const response = await client.query(
-    `SELECT id, username, 
-            password FROM users WHERE username=$1`,
-    [username]
-  );
+  const response = await client.query(`SELECT * FROM users WHERE username=$1`, [
+    username,
+  ]);
   if (
     !response.rows.length ||
     (await bcrypt.compare(password, response.rows[0].password)) === false
@@ -237,8 +235,10 @@ const authenticate = async ({ username, password }) => {
   }
 
   const token = await jwt.sign({ id: response.rows[0].id }, JWT);
+  const users = response.rows[0];
   return {
     token,
+    users: users,
   };
 };
 

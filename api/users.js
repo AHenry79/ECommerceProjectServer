@@ -39,4 +39,13 @@ router.get("/:id", isAdmin, async (req, res, next) => {
   }
 });
 
+router.get("/check/token", isAdmin, async (req, res, next) => {
+  try {
+    const user = await findUserWithToken(req.headers.authorization);
+    res.send(user);
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
