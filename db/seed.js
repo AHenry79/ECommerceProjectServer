@@ -53,6 +53,7 @@ async function createTables() {
         "id" SERIAL NOT NULL,
         "product_id" int4 NOT NULL,
         "customer_id" int4 NOT NULL,
+        "quantity" int4 NOT NULL DEFAULT 1,
         PRIMARY KEY ("id")
         );
 
@@ -117,10 +118,10 @@ async function createInitialCartItems() {
   try {
     console.log("Starting to create cart items...");
     await client.query(`
-        INSERT INTO "cart" ("product_id", "customer_id") VALUES
-        (3, 3),
-        (10, 1),
-        (14, 3)
+        INSERT INTO "cart" ("product_id", "customer_id", "quantity") VALUES
+        (3, 3, 2),
+        (10, 1, 1),
+        (14, 3, 1)
         `);
     console.log("Finished creating cart items!");
   } catch (error) {

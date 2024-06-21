@@ -3,17 +3,8 @@ const userRouter = express.Router();
 const {
   createUserAndGenerateToken,
   authenticate,
-  findUserWithToken,
+  isLoggedIn,
 } = require("../db/index");
-
-const isLoggedIn = async (req, res, next) => {
-  try {
-    req.user = await findUserWithToken(req.headers.authorization);
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
 
 userRouter.post("/register", async (req, res, next) => {
   try {
@@ -37,5 +28,4 @@ userRouter.get("/me", isLoggedIn, (req, res, next) => {
     next(err);
   }
 });
-
 module.exports = userRouter;

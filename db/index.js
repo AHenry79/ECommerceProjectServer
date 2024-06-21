@@ -73,7 +73,8 @@ const getCartItemsByUserId = async (params_id) => {
     `SELECT * FROM cart WHERE customer_id = $1`,
     [params_id]
   );
-  const { id, customer_id } = response.rows.length > 0 ? response.rows[0] : {};
+  const { id, customer_id, quantity } =
+    response.rows.length > 0 ? response.rows[0] : {};
   const cartItems = [];
 
   for (let i of response.rows) {
@@ -91,6 +92,7 @@ const getCartItemsByUserId = async (params_id) => {
       categories: product.categories,
       image_url: product.image_url,
       availability: product.availability,
+      quantity,
     });
   }
 
@@ -109,6 +111,7 @@ const getCartItemsByUserId = async (params_id) => {
     id: id,
     customer_id: customer_id,
     cart: cart,
+    quantity: quantity,
   };
 };
 const getSingleUserById = async (id) => {
@@ -237,7 +240,7 @@ const authenticate = async ({ username, password }) => {
   const token = await jwt.sign({ id: response.rows[0].id }, JWT);
   const users = response.rows[0];
   return {
-    token,
+    token: token,
     users: users,
   };
 };
@@ -249,7 +252,7 @@ const findUserWithToken = async (token) => {
     const payload = await jwt.verify(token, JWT);
     id = payload.id;
   } catch (ex) {
-    const error = Error("not authorized");
+    const error = Error("test error");
     error.status = 401;
     throw error;
   }
@@ -266,6 +269,27 @@ const findUserWithToken = async (token) => {
   }
 
   return response.rows[0];
+};
+const isLoggedIn = async (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).send("No token provided");
+  }
+  try {
+    req.user = jwt.verify(token, JWT);
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+const updateQuantity = async (id, body) => {
+  const response = await client.query(
+    `UPDATE products SET quantity = $1 WHERE id = $2`,
+    [body.quantity, id]
+  );
+  return {
+    quantity: body.quantity,
+  };
 };
 module.exports = {
   getAllUsers,
@@ -286,5 +310,7 @@ module.exports = {
   addProduct,
   editProduct,
   deleteProduct,
+  isLoggedIn,
+  updateQuantity,
   client,
 };

@@ -6,6 +6,7 @@ const {
   getProductsByOrderId,
   checkOut,
   findUserWithToken,
+  isLoggedIn,
 } = require("../db/index");
 
 const isAdmin = async (req, res, next) => {
@@ -14,14 +15,6 @@ const isAdmin = async (req, res, next) => {
     if (req.user.is_admin === true) {
       next();
     }
-  } catch (err) {
-    next(err);
-  }
-};
-const isLoggedIn = async (req, res, next) => {
-  try {
-    req.user = await findUserWithToken(req.headers.authorization);
-    next();
   } catch (err) {
     next(err);
   }

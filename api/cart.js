@@ -4,17 +4,9 @@ const {
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
-  findUserWithToken,
+  isLoggedIn,
+  updateQuantity,
 } = require("../db/index");
-
-const isLoggedIn = async (req, res, next) => {
-  try {
-    req.user = await findUserWithToken(req.headers.authorization);
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
 
 router.get("/users/:id", isLoggedIn, async (req, res, next) => {
   try {
@@ -35,6 +27,13 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
   try {
     const customer_id = req.user.id;
     res.send(await deleteCartItemById(req.params.id, customer_id));
+  } catch (err) {
+    next(err);
+  }
+});
+router.put("/", isLoggedIn, async (req, res, next) => {
+  try {
+    res.send(await updateQuantity(req.params.id, req.body));
   } catch (err) {
     next(err);
   }

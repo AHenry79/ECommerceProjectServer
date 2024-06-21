@@ -30,7 +30,7 @@ router.get("/", isAdmin, async (req, res, next) => {
 });
 
 // get single user by id
-router.get("/:id", isAdmin, async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const user = await getSingleUserById(req.params.id);
     res.send(user);
@@ -39,7 +39,7 @@ router.get("/:id", isAdmin, async (req, res, next) => {
   }
 });
 
-router.get("/check/token", isAdmin, async (req, res, next) => {
+router.get("/check/token", async (req, res, next) => {
   try {
     const user = await findUserWithToken(req.headers.authorization);
     res.send(user);
