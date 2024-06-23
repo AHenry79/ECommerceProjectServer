@@ -267,13 +267,6 @@ const isLoggedIn = async (req, res, next) => {
     next(err);
   }
 };
-const updateQuantity = async (req, res, next) => {
-  const response = await client.query(
-    `UPDATE cart SET quantity = $1 WHERE id = $2 RETURNING *`,
-    [body.quantity, body.id]
-  );
-  return response.rows[0];
-};
 module.exports = {
   getAllUsers,
   getAllProducts,
@@ -294,6 +287,5 @@ module.exports = {
   editProduct,
   deleteProduct,
   isLoggedIn,
-  updateQuantity,
   client,
 };
