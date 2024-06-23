@@ -45,9 +45,9 @@ productsRouter.post("/", isAdmin, async (req, res, next) => {
   }
 });
 
-productsRouter.put("/:id", isAdmin, async (req, res, next) => {
+productsRouter.patch("/editProducts/:id", isAdmin, async (req, res, next) => {
   try {
-    res.send(await editProduct(req.params.id, req.body));
+    res.send(await editProduct(req.body));
   } catch (err) {
     next(err);
   }

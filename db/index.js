@@ -21,7 +21,7 @@ const getSingleProduct = async (id) => {
 };
 const addProduct = async (body) => {
   await client.query(
-    `INSERT INTO products(price, description, name, categories, image_url, availability) VALUES($1, $2, $3, $4, $5, $6)`,
+    `INSERT INTO products(price, description, name, categories, image_url, availability, nutrition_facts) VALUES($1, $2, $3, $4, $5, $6, $7)`,
     [
       body.price,
       body.description,
@@ -29,6 +29,7 @@ const addProduct = async (body) => {
       body.categories,
       body.image_url,
       body.availability,
+      body.nutrition_facts,
     ]
   );
   return {
@@ -38,11 +39,12 @@ const addProduct = async (body) => {
     categories: body.categories,
     image_url: body.image_url,
     availability: body.availability,
+    nutrition_facts: body.nutrition_facts,
   };
 };
-const editProduct = async (id, body) => {
-  await client.query(
-    `UPDATE products SET price = $1, description = $2, name = $3, categories = $4, image_url = $5, availability = $6 WHERE id = $7`,
+const editProduct = async (body) => {
+  const response = await client.query(
+    `UPDATE products SET price = $1, description = $2, name = $3, categories = $4, image_url = $5, availability = $6, nutrition_facts = $7 WHERE id = $8 RETURNING *`,
     [
       body.price,
       body.description,
@@ -50,17 +52,11 @@ const editProduct = async (id, body) => {
       body.categories,
       body.image_url,
       body.availability,
-      id,
+      body.nutrition_facts,
+      body.id,
     ]
   );
-  return {
-    price: body.price,
-    description: body.description,
-    name: body.name,
-    categories: body.categories,
-    image_url: body.image_url,
-    availability: body.availability,
-  };
+  return response.rows[0];
 };
 const deleteProduct = async (id) => {
   await client.query(`DELETE FROM products WHERE id=$1`, [Number(id)]);
@@ -282,15 +278,6 @@ const isLoggedIn = async (req, res, next) => {
     next(err);
   }
 };
-const updateQuantity = async (id, body) => {
-  const response = await client.query(
-    `UPDATE products SET quantity = $1 WHERE id = $2`,
-    [body.quantity, id]
-  );
-  return {
-    quantity: body.quantity,
-  };
-};
 module.exports = {
   getAllUsers,
   getAllProducts,
@@ -311,6 +298,5 @@ module.exports = {
   editProduct,
   deleteProduct,
   isLoggedIn,
-  updateQuantity,
   client,
 };
