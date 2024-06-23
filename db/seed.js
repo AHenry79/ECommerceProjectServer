@@ -62,6 +62,8 @@ async function createTables() {
         "product_id" int4 NOT NULL,
         "customer_id" int4 NOT NULL,
         "ordered_at" timestamptz NOT NULL DEFAULT now(),
+        "quantity" int4 NOT NULL DEFAULT 1,
+        "price" numeric NOT NULL,
         PRIMARY KEY ("id")
         );
       `);
@@ -133,10 +135,10 @@ async function createInitialOrderedItems() {
   try {
     console.log("Starting to create ordered items...");
     await client.query(`
-        INSERT INTO "orders" ("product_id", "customer_id") VALUES
-        (14, 3),
-        (5, 2),
-        (1, 3)
+        INSERT INTO "orders" ("product_id", "customer_id", "quantity", "price") VALUES
+        (14, 3, 1, 7.99),
+        (5, 2, 2, 7.32),
+        (1, 3, 5, 9.95)
         `);
     console.log("Finished creating ordered items!");
   } catch (error) {

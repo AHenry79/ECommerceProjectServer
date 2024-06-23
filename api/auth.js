@@ -1,14 +1,10 @@
 const express = require("express");
 const userRouter = express.Router();
-const {
-  createUserAndGenerateToken,
-  authenticate,
-  isLoggedIn,
-} = require("../db/index");
+const { createUser, authenticate, isLoggedIn } = require("../db/index");
 
 userRouter.post("/register", async (req, res, next) => {
   try {
-    res.send(await createUserAndGenerateToken(req.body));
+    res.send(await createUser(req.body));
   } catch (err) {
     next(err);
   }

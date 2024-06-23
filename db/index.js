@@ -88,7 +88,7 @@ const getCartItemsByUserId = async (params_id) => {
       categories: product.categories,
       image_url: product.image_url,
       availability: product.availability,
-      quantity,
+      quantity: quantity,
     });
   }
 
@@ -101,13 +101,13 @@ const getCartItemsByUserId = async (params_id) => {
     categories: item.categories,
     image_url: item.image_url,
     availability: item.availability,
+    quantity: item.quantity,
   }));
 
   return {
     id: id,
     customer_id: customer_id,
     cart: cart,
-    quantity: quantity,
   };
 };
 const getSingleUserById = async (id) => {
@@ -139,25 +139,12 @@ const getSingleOrder = async (id, customer_id) => {
     throw new Error("User is not authorized to access these orders");
   }
 };
-const getProductsByOrderId = async (id, customer_id) => {
-  const cart = await client.query(
-    `SELECT customer_id FROM cart WHERE customer_id = $1`,
-    [Number(id)]
+const getOrderByUserId = async (customer_id) => {
+  const response = await client.query(
+    `SELECT * FROM orders WHERE customer_id = $1`,
+    [customer_id]
   );
-  if (
-    cart &&
-    cart.rows &&
-    cart.rows.length > 0 &&
-    cart.rows[0].customer_id === customer_id
-  ) {
-    const response = await client.query(
-      `SELECT * FROM orders WHERE customer_id = $1`,
-      [id]
-    );
-    return response.rows;
-  } else {
-    throw new Error("User is not authorized to access these orders");
-  }
+  return response.rows;
 };
 const addToCartByUserId = async (body) => {
   await client.query(
@@ -190,12 +177,14 @@ const deleteCartItemById = async (id, customer_id) => {
 };
 const checkOut = async (body) => {
   await client.query(
-    `INSERT INTO orders(product_id, customer_id) VALUES($1, $2)`,
-    [body.product_id, body.customer_id]
+    `INSERT INTO orders(product_id, customer_id, quantity, price) VALUES($1, $2, $3, $4)`,
+    [body.product_id, body.customer_id, body.quantity, body.price]
   );
   return {
     product_id: body.product_id,
     customer_id: body.customer_id,
+    quantity: body.quantity,
+    price: body.price,
   };
 };
 const createUser = async ({ username, password, email, phone_number }) => {
@@ -278,6 +267,13 @@ const isLoggedIn = async (req, res, next) => {
     next(err);
   }
 };
+const updateQuantity = async (req, res, next) => {
+  const response = await client.query(
+    `UPDATE cart SET quantity = $1 WHERE id = $2 RETURNING *`,
+    [body.quantity, body.id]
+  );
+  return response.rows[0];
+};
 module.exports = {
   getAllUsers,
   getAllProducts,
@@ -292,11 +288,12 @@ module.exports = {
   findUserWithToken,
   getAllOrders,
   getSingleOrder,
-  getProductsByOrderId,
+  getOrderByUserId,
   checkOut,
   addProduct,
   editProduct,
   deleteProduct,
   isLoggedIn,
+  updateQuantity,
   client,
 };

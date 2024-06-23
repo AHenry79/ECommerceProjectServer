@@ -3,7 +3,7 @@ const ordersRouter = express.Router();
 const {
   getAllOrders,
   getSingleOrder,
-  getProductsByOrderId,
+  getOrderByUserId,
   checkOut,
   findUserWithToken,
   isLoggedIn,
@@ -37,8 +37,7 @@ ordersRouter.get("/:id", isLoggedIn, async (req, res, next) => {
 });
 ordersRouter.get("/users/:id", isLoggedIn, async (req, res, next) => {
   try {
-    const customer_id = req.user.id;
-    res.send(await getProductsByOrderId(req.params.id, customer_id));
+    res.send(await getOrderByUserId(req.params.id));
   } catch (err) {
     next(err);
   }

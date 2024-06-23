@@ -4,6 +4,7 @@ const {
   getCartItemsByUserId,
   addToCartByUserId,
   deleteCartItemById,
+  updateQuantity,
   isLoggedIn,
 } = require("../db/index");
 
@@ -26,6 +27,13 @@ router.delete("/:id", isLoggedIn, async (req, res, next) => {
   try {
     const customer_id = req.user.id;
     res.send(await deleteCartItemById(req.params.id, customer_id));
+  } catch (err) {
+    next(err);
+  }
+});
+router.patch("/", isLoggedIn, async (req, res, next) => {
+  try {
+    res.send(await updateQuantity(req.body));
   } catch (err) {
     next(err);
   }
